@@ -12,25 +12,6 @@ exports.sillyNameMaker = functions.https.onRequest((req, response) => {
     console.log('Request headers: ' + JSON.stringify(req.headers));
     console.log('Request body: ' + JSON.stringify(req.body));
 
-    // Hardcode user
-    app.data.summoner = {
-        "profileIconId": 3006,
-        "name": "XSkills",
-        "summonerLevel": 33,
-        "accountId": 36106782,
-        "id": 22358151,
-        "revisionDate": 1513496761000
-    }
-
-    app.data.summoner = {
-        "profileIconId": 1376,
-        "name": "Awaykened",
-        "summonerLevel": 56,
-        "accountId": 207836204,
-        "id": 45070516,
-        "revisionDate": 1516586909000
-    }
-
     // ===============
     // === HELPERS ===
     // ===============
@@ -124,12 +105,12 @@ exports.sillyNameMaker = functions.https.onRequest((req, response) => {
     }
 
     // getMastery: Returns the champion that the user has the highest mastery for
-    function getMastery() {
+    function getMastery(app) {
         let url = makeUrl(`/lol/champion-mastery/v3/champion-masteries/by-summoner/${summoner.id}`);
         request(url, (error, response, body) => {
             let obj = JSON.parse(body)[0];
             getChampionName(obj.championId, (championName) => {
-                console.log(`Your highest mastery is with ${championName} at ${obj.championPoints} points`);
+                app.ask(`Your highest mastery is with ${championName} at ${obj.championPoints} points`);
             }); 
         });
     }
@@ -142,7 +123,6 @@ exports.sillyNameMaker = functions.https.onRequest((req, response) => {
             if (!obj) {
                 callback("Unranked");
             }
-            //console.log(obj);
             callback(`${obj.tier} ${romanToNumeric(obj.rank)}, Win rate: ${winRate(obj.wins, obj.losses)}`);
         })
     }
@@ -199,7 +179,7 @@ exports.sillyNameMaker = functions.https.onRequest((req, response) => {
         request(url, function (error, response, body) {
             obj = JSON.parse(body);
             if (!obj.participants) {
-                console.log("You are not in game!!");
+                app.ask("You are not in game!!");
             } else {
                 let team = [];
                 obj.participants.forEach((player) => {
@@ -211,7 +191,7 @@ exports.sillyNameMaker = functions.https.onRequest((req, response) => {
                                     team.push(`${player.summonerName}, ${stats}`);
                                     count++;
                                     if (count == (obj.participants.length/2)) {
-                                        console.log(`You are playing against \n${team.join('.\n')} `);
+                                        app.ask(`You are playing against \n${team.join('.\n')} `);
                                     }
                                 })
                             }
