@@ -1,2 +1,5 @@
 node_modules/
 temp/
+functions/api_key.json
+sampleGame.json
+samplePositions.json
